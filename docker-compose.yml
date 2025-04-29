@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./src/backend
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - JWT_SECRET=${JWT_SECRET}
+      - ETH_RPC_URL=${ETH_RPC_URL}
+      - ETH_PRIVATE_KEY=${ETH_PRIVATE_KEY}
+      - VOTING_CONTRACT_ADDRESS=${VOTING_CONTRACT_ADDRESS}
+      - DATABASE_URL=${DATABASE_URL}
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./src/frontend
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_GOOGLE_CLIENT_ID=${REACT_APP_GOOGLE_CLIENT_ID}
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:14-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: votingdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
